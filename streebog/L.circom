@@ -1,16 +1,8 @@
 pragma circom 2.1.5;
 
 include "../bitify.circom";
+include "utils.circom";
 
-template IsZero() {
-  signal input in;
-  signal output out;
-
-  signal inv <-- in != 0 ? 1 / in : 0;
-  out <== 1 - (in * inv);
-
-  in * out === 0;
-}
 
 template Adder(n) {
   signal input in[n];
@@ -23,12 +15,6 @@ template Adder(n) {
   out <== lc;
 }
 
-template IsEqual() {
-  signal input in[2];
-  signal output out;
-
-  out <== IsZero()(in[1] - in[0]);
-}
 
 template GetA(){
     signal input index; 
@@ -66,13 +52,53 @@ template L() {
     signal input a[64];
     signal output out[64];
     var indexByte = 0;
-    component a_values[64];
-    component num2bits[64];
-
-    for (i = 0; i < 64; i++){
-        num2bits[i] = Num2Bits(8)
-        num2bits[i] = a[i]
+    component bytes_as_bits[64];
+    var matrix_sum[8] = [0,0,0,0,0,0,0,0];
+    for (var i = 0; i < 64; i++){
+        bytes_as_bits[i] = Num2Bits(8);
+        bytes_as_bits[i].in <== a[i];
     }
 
+    for (var i = 0; i < 8; i++){ //Перебор строк 8-байтовых слов
+        for (var j = 0; j < 8; j++){ //Перебор байтов в строке
+            for (var k = 0; k < 8; k++){ //Перебор бит в байте
+                var isZeroBit = IsZero()(bytes_as_bits[i * 8 + j].out[k]); //Проверка значения бита
+                var matrix_tmp = GetA()(j*8+k); //безусловное получение значения из матрицы
+                var isIndex = IsEqual()([isZeroBit, 1]) ; //проверка значения бита
+                matrix_sum[i] = BitwiseXOR(64)(matrix_tmp * isIndex, matrix_sum[i]); //если бит равен единице то строка матрицы будет сксорена 
+                                                      // а если равен нулю то она станет нулевой и XOR ни к чему не приведет
+            }
+        }
+    }
+    
+    for (var i = 0; i < 8; i++){
+        var matrix_sum_as_bits[64] = Num2Bits(64)(matrix_sum[i]);
+        out[8*i]   <== matrix_sum_as_bits[0] * 1 + matrix_sum_as_bits[1] * 2 + matrix_sum_as_bits[2] * 4 
+                            + matrix_sum_as_bits[3] * 8+ matrix_sum_as_bits[4] * 16+ matrix_sum_as_bits[5] * 32 
+                            + matrix_sum_as_bits[6] * 64+ matrix_sum_as_bits[7] * 128;
+        
+        out[8*i+1] <== matrix_sum_as_bits[8] * 1 + matrix_sum_as_bits[9] * 2 + matrix_sum_as_bits[10] * 4 
+                            + matrix_sum_as_bits[11] * 8+ matrix_sum_as_bits[12] * 16+ matrix_sum_as_bits[13] * 32 
+                            + matrix_sum_as_bits[14] * 64+ matrix_sum_as_bits[15] * 128;
+
+        out[8*i+2] <== matrix_sum_as_bits[16] * 1 + matrix_sum_as_bits[17] * 2 + matrix_sum_as_bits[18] * 4 
+                            + matrix_sum_as_bits[19] * 8+ matrix_sum_as_bits[20] * 16+ matrix_sum_as_bits[21] * 32 
+                            + matrix_sum_as_bits[22] * 64+ matrix_sum_as_bits[23] * 128;
+        out[8*i+3] <== matrix_sum_as_bits[24] * 1 + matrix_sum_as_bits[25] * 2 + matrix_sum_as_bits[26] * 4 
+                            + matrix_sum_as_bits[27] * 8+ matrix_sum_as_bits[28] * 16+ matrix_sum_as_bits[29] * 32 
+                            + matrix_sum_as_bits[30] * 64+ matrix_sum_as_bits[31] * 128;
+        out[8*i+4] <== matrix_sum_as_bits[32] * 1 + matrix_sum_as_bits[33] * 2 + matrix_sum_as_bits[34] * 4 
+                            + matrix_sum_as_bits[35] * 8+ matrix_sum_as_bits[36] * 16+ matrix_sum_as_bits[37] * 32 
+                            + matrix_sum_as_bits[38] * 64+ matrix_sum_as_bits[39] * 128;
+        out[8*i+5] <== matrix_sum_as_bits[40] * 1 + matrix_sum_as_bits[41] * 2 + matrix_sum_as_bits[42] * 4 
+                            + matrix_sum_as_bits[43] * 8+ matrix_sum_as_bits[44] * 16+ matrix_sum_as_bits[45] * 32 
+                            + matrix_sum_as_bits[46] * 64+ matrix_sum_as_bits[47] * 128;
+        out[8*i+6] <== matrix_sum_as_bits[48] * 1 + matrix_sum_as_bits[49] * 2 + matrix_sum_as_bits[50] * 4 
+                            + matrix_sum_as_bits[51] * 8+ matrix_sum_as_bits[52] * 16+ matrix_sum_as_bits[53] * 32 
+                            + matrix_sum_as_bits[54] * 64+ matrix_sum_as_bits[55] * 128;
+        out[8*i+7] <== matrix_sum_as_bits[56] * 1 + matrix_sum_as_bits[57] * 2 + matrix_sum_as_bits[58] * 4 
+                            + matrix_sum_as_bits[59] * 8+ matrix_sum_as_bits[60] * 16+ matrix_sum_as_bits[61] * 32 
+                            + matrix_sum_as_bits[62] * 64+ matrix_sum_as_bits[63] * 128;
+    }
 
 }
