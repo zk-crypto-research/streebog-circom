@@ -1,6 +1,6 @@
 pragma circom 2.1.5;
 
-include "../bitify.circom";
+include "circomlib/circuits/bitify.circom";
 include "utils.circom";
 
 

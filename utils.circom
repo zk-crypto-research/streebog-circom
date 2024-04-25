@@ -1,6 +1,6 @@
 pragma circom 2.0.0;
-include "../gates.circom";
-include "../bitify.circom";
+include "circomlib/circuits/gates.circom";
+include "circomlib/circuits/bitify.circom";
 
 template BitwiseXOR(n) {
     signal input a;
@@ -22,7 +22,7 @@ template BitwiseXOR(n) {
         xors[k].a <== a_as_bits.out[k];
         xors[k].b <== b_as_bits.out[k];
     }
-    
+
     for (var k=0; k<n; k++) {
         tmp_out[k] <== xors[k].out;
     }

@@ -1,5 +1,5 @@
 pragma circom 2.0.0;
-include "../gates.circom";
+include "circomlib/circuits/gates.circom";
 include "utils.circom";
 template X() {
     signal input a[64];
