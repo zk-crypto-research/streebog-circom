@@ -4,18 +4,6 @@ include "../bitify.circom";
 include "utils.circom";
 
 
-template Adder(n) {
-  signal input in[n];
-  signal output out;
-
-  var lc = 0;
-  for (var i = 0; i < n; i++) {
-    lc += in[i];
-  }
-  out <== lc;
-}
-
-
 template GetA(){
     signal input index; 
     signal output out;

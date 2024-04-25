@@ -1,32 +1,6 @@
 pragma circom 2.1.5;
 
-template IsZero() {
-  signal input in;
-  signal output out;
 
-  signal inv <-- in != 0 ? 1 / in : 0;
-  out <== 1 - (in * inv);
-
-  in * out === 0;
-}
-
-template Adder(n) {
-  signal input in[n];
-  signal output out;
-
-  var lc = 0;
-  for (var i = 0; i < n; i++) {
-    lc += in[i];
-  }
-  out <== lc;
-}
-
-template IsEqual() {
-  signal input in[2];
-  signal output out;
-
-  out <== IsZero()(in[1] - in[0]);
-}
 
 template PermutateTau(){
     signal input index; 
